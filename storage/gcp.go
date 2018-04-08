@@ -24,7 +24,7 @@ func NewGCS(projectID, bucket string) (*GCS, error) {
 	ctx := context.Background()
 	db, err := gcs.NewClient(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create client: %s", err)
 	}
 
 	return &GCS{
@@ -38,12 +38,12 @@ func NewGCS(projectID, bucket string) (*GCS, error) {
 func (g *GCS) PutDay(date time.Time, day *types.Day) error {
 	data, err := proto.Marshal(day)
 	if err != nil {
-		return fmt.Errorf("unmarshal day: %s", err)
+		return fmt.Errorf("marshal day: %s", err)
 	}
 
 	bkt := g.db.Bucket(g.bucket)
 	if err := bkt.Create(g.ctx, g.projectID, nil); err != nil {
-		return fmt.Errorf("bucket create: %s", err)
+		// pass
 	}
 
 	obj := bkt.Object(KeyForDate(date))
@@ -58,14 +58,16 @@ func (g *GCS) PutDay(date time.Time, day *types.Day) error {
 	return nil
 }
 
-func (g *GCS) GetDay(date string) (*types.Day, error) {
+func (g *GCS) GetDay(date time.Time) (*types.Day, error) {
+	dateKey := KeyForDate(date)
+
 	day := &types.Day{}
 
 	bkt := g.db.Bucket(g.bucket)
-	obj := bkt.Object(date)
+	obj := bkt.Object(dateKey)
 	r, err := obj.NewReader(g.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("object read: %s", err)
+		return nil, fmt.Errorf("object read %s: %s", dateKey, err)
 	}
 	defer r.Close()
 
@@ -79,8 +81,11 @@ func (g *GCS) GetDay(date string) (*types.Day, error) {
 	}
 
 	err = proto.Unmarshal(data.Bytes(), day)
+	if err != nil {
+		return nil, fmt.Errorf("unmarshal day: %s", err)
+	}
 
-	return day, err
+	return day, nil
 }
 
 func (g *GCS) Close() error {

@@ -3,6 +3,8 @@
     <head>
         <meta charset="utf-8">
         <title>Dumpertijdmachine</title>
+        <meta name="description" content="Makkelijk oude Dumpert toppers terug kijken.">
+        <meta name="keywords" content="dumpert,historie,history,terugkijken,toppers,gisteren,vorige,week,filmpjes,kijken">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
         <!--[if lt IE 9]>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
@@ -32,7 +34,7 @@
                 font-size: 48pt;
             }
 
-            .next p {
+            .prev p, .next p {
                 color: lightgrey;
             }
 
@@ -56,7 +58,7 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-6 col-md-12">
                         <h1 class="text-center">Dumpertijdmachine</h1>
-                        <h4 class="text-center">Plezier voor jong en oud</h4>
+                        <h4 class="text-center">Toppers terugkijken 🎉</h4>
                         <p class="text-center">{{.Date}}</p>
                     </div>
                 </div>
@@ -66,7 +68,11 @@
                     <div class="row justify-content-center align-middle">
                         {{if eq $index 2}}
                         <div class="col-1 text-center prev">
+                            {{if hasPrevDate $.Date}}
                             <a href="/{{prevDate $.Date}}">&lt;</a>
+                            {{else}}
+                            <p href="/{{prevDate $.Date}}">&lt;</p>
+                            {{end}}
                         </div>
                         {{end}}
                         <div class="col-lg-6 col-md-10 col-10">
@@ -95,9 +101,9 @@
                         {{if eq $index 2}}
                         <div class="col-1 text-center next">
                             {{if hasNextDate $.Date}}
-                            <p href="/{{nextDate $.Date}}">&gt;</p>
-                            {{else}}
                             <a href="/{{nextDate $.Date}}">&gt;</a>
+                            {{else}}
+                            <p href="/{{nextDate $.Date}}">&gt;</p>
                             {{end}}
                         </div>
                         {{end}}

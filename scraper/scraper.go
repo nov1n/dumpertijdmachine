@@ -32,7 +32,7 @@ func (sc *Scraper) Scrape() error {
 	c := colly.NewCollector()
 
 	day := &types.Day{
-		Date: string(storage.KeyForDate(time.Now())),
+		Date: storage.KeyForDate(time.Now()),
 	}
 
 	c.OnError(func(res *colly.Response, err error) {
