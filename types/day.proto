@@ -1,0 +1,16 @@
+syntax = "proto3";
+package types;
+
+message Video {
+  string title = 1;
+  int32 rank = 2;
+  int32 views = 3;
+  int32 kudos = 4;
+  string url = 5;
+  string thumb = 6;
+}
+
+message Day {
+  string date = 1;
+  repeated Video videos = 2;
+}

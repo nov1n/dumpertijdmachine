@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Dumpertijdmachine</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <!--[if lt IE 9]>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![endif]-->
+        <style>
+            body {
+                background-color: white;
+            }
+
+            h1 {
+                color: darkblue;
+            } 
+
+            a, a:hover {
+                color: inherit;
+            } 
+
+            .title {
+                color: darkblue;
+            }
+
+            .rank {
+                color: darkgrey;
+            }
+
+            .next, .prev {
+                font-size: 48pt;
+            }
+
+            .next p {
+                color: lightgrey;
+            }
+
+            .rank {
+                font-size :32pt;
+            }
+
+            .video {
+                padding: 10px;
+            }
+
+            .outer {
+                margin-top: 50px;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
+        <div>
+            <div class="container outer">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6 col-md-12">
+                        <h1 class="text-center">Dumpertijdmachine</h1>
+                        <h4 class="text-center">Plezier voor jong en oud</h4>
+                        <p class="text-center">{{.Date}}</p>
+                    </div>
+                </div>
+                {{range $index, $element := .Videos}}
+                    <!--<iframe src="https://www.dumpert.nl/embed/7402833/7ca090f2/" width="480" height="270" class="dumpertembed" frameborder="0" allowfullscreen></iframe>-->
+                    <!-- topreaguuresels -->
+                    <div class="row justify-content-center align-middle">
+                        {{if eq $index 2}}
+                        <div class="col-1 text-center prev">
+                            <a href="/{{prevDate $.Date}}">&lt;</a>
+                        </div>
+                        {{end}}
+                        <div class="col-lg-6 col-md-10 col-10">
+                            <a href="{{.Url}}">
+                                <div class="row video">
+                                    <div class="col-3">
+                                        <img class="img-fluid" src="{{.Thumb}}"/>
+                                    </div>
+                                    <div class="col-7">
+                                        <div class="row">
+                                            <h5 class="col-12 title">{{.Title}}</h5>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 views">👁   {{.Views}}</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 kudos">👍 {{.Kudos}}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 rank">
+                                        #{{inc $index}}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {{if eq $index 2}}
+                        <div class="col-1 text-center next">
+                            {{if hasNextDate $.Date}}
+                            <p href="/{{nextDate $.Date}}">&gt;</p>
+                            {{else}}
+                            <a href="/{{nextDate $.Date}}">&gt;</a>
+                            {{end}}
+                        </div>
+                        {{end}}
+                    </div>
+                {{end}}
+            </div>
+        </div>
+    </body>
+</html>
