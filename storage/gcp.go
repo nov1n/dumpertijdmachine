@@ -2,10 +2,11 @@ package storage
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"time"
+
+	"golang.org/x/net/context"
 
 	gcs "cloud.google.com/go/storage"
 	"github.com/golang/protobuf/proto"
