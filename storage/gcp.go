@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/context"
@@ -48,11 +50,9 @@ func (g *GCS) PutDay(date time.Time, day *types.Day) error {
 
 	obj := bkt.Object(KeyForDate(date))
 	w := obj.NewWriter(g.ctx)
+	defer w.Close()
 	if _, err := fmt.Fprintf(w, "%s", data); err != nil {
 		return fmt.Errorf("object write: %s", err)
-	}
-	if err := w.Close(); err != nil {
-		return fmt.Errorf("object write close: %s", err)
 	}
 
 	return nil
@@ -86,6 +86,50 @@ func (g *GCS) GetDay(date time.Time) (*types.Day, error) {
 	}
 
 	return day, nil
+}
+
+func (g *GCS) PutImage(url string) error {
+	log.Printf("Putting image: %s", url)
+	res, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("downloading image: %s", err)
+	}
+	defer res.Body.Close()
+
+	bkt := g.db.Bucket(g.bucket)
+	if err := bkt.Create(g.ctx, g.projectID, nil); err != nil {
+		// pass
+	}
+
+	obj := bkt.Object(ImageName(url))
+	w := obj.NewWriter(g.ctx)
+	defer w.Close()
+	_, err = io.Copy(w, res.Body)
+	if err != nil {
+		return fmt.Errorf("object write: %s", err)
+	}
+	return nil
+}
+
+func (g *GCS) GetImage(url string) (*bytes.Buffer, error) {
+	name := ImageName(url)
+	bkt := g.db.Bucket(g.bucket)
+	obj := bkt.Object(name)
+	r, err := obj.NewReader(g.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("object read %s: %s", name, err)
+	}
+	defer r.Close()
+
+	data := &bytes.Buffer{}
+	if _, err := io.Copy(data, r); err != nil {
+		return nil, fmt.Errorf("image get copy: %s", name)
+	}
+
+	if data == nil {
+		return nil, fmt.Errorf("image not found: %s", name)
+	}
+	return data, nil
 }
 
 func (g *GCS) Close() error {

@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>Dumpertijdmachine</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="Makkelijk oude Dumpert toppers terug kijken.">
         <meta name="keywords" content="dumpert,historie,history,terugkijken,toppers,gisteren,vorige,week,filmpjes,kijken">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -16,6 +17,7 @@
 
             h1 {
                 color: darkblue;
+                font-size: 2em;
             } 
 
             a, a:hover {
@@ -28,6 +30,7 @@
 
             .rank {
                 color: darkgrey;
+                text-align: right;
             }
 
             .next, .prev {
@@ -47,69 +50,109 @@
             }
 
             .outer {
+                max-width: 900px;
                 margin-top: 50px;
+            }
+
+            #date-input {
+                margin: 0 auto;
+                display: block;
+                border: none;
+                text-align: center;
+            }
+
+            input[type=date]::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                display: none;
+            }
+
+            .disclaimer {
+                margin-top: 30px;
+                color: darkgrey;
+            }
+
+            .header {
+                margin-bottom: 50px;
             }
         </style>
     </head>
     <body>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
-        <div>
-            <div class="container outer">
-                <div class="row justify-content-center">
-                    <div class="col-lg-6 col-md-12">
-                        <h1 class="text-center">Dumpertijdmachine</h1>
-                        <h4 class="text-center">Toppers terugkijken 🎉</h4>
-                        <p class="text-center">{{.Date}}</p>
-                    </div>
+        <div class="container outer">
+            <div class="row justify-content-center header">
+                <div class="col-12">
+                    <a href="/"><h1 class="text-center">Dumpertijdmachine</h1></a>
+                    <h4 class="text-center">Toppers terugkijken 🎉</h4>
+                    <input id="date-input" required="required" type="date" min="2018-04-08" value="{{htmlDateFormat $.Date}}">
                 </div>
-                {{range $index, $element := .Videos}}
-                    <!--<iframe src="https://www.dumpert.nl/embed/7402833/7ca090f2/" width="480" height="270" class="dumpertembed" frameborder="0" allowfullscreen></iframe>-->
-                    <!-- topreaguuresels -->
-                    <div class="row justify-content-center align-middle">
-                        {{if eq $index 2}}
-                        <div class="col-1 text-center prev">
+            </div>
+            {{range $index, $element := .Videos}}
+                <!--<iframe src="https://www.dumpert.nl/embed/7402833/7ca090f2/" width="480" height="270" class="dumpertembed" frameborder="0" allowfullscreen></iframe>-->
+                <!-- topreaguuresels -->
+                <div class="row justify-content-center align-middle">
+                    {{if eq $index 2}}
+                        <div class="col-2 text-center prev">
                             {{if hasPrevDate $.Date}}
-                            <a href="/{{prevDate $.Date}}">&lt;</a>
+                                <a href="/{{prevDate $.Date}}">&lt;</a>
                             {{else}}
-                            <p href="/{{prevDate $.Date}}">&lt;</p>
+                                <p href="/{{prevDate $.Date}}">&lt;</p>
                             {{end}}
                         </div>
-                        {{end}}
-                        <div class="col-lg-6 col-md-10 col-10">
-                            <a href="{{.Url}}">
-                                <div class="row video">
-                                    <div class="col-3">
-                                        <img class="img-fluid" src="{{.Thumb}}"/>
+                    {{end}}
+                    <div class="col-8">
+                        <a href="{{.Url}}">
+                            <div class="row video">
+                                <div class="col-3 d-none d-sm-block">
+                                    <img class="img-fluid" src="data:image/jpeg;base64, {{base64 .Thumb}}"/>
+                                </div>
+                                <div class="col-md-7 col-12">
+                                    <div class="row">
+                                        <h5 class="col-12 title">{{.Title}}</h5>
                                     </div>
-                                    <div class="col-7">
-                                        <div class="row">
-                                            <h5 class="col-12 title">{{.Title}}</h5>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6 views">👁   {{.Views}}</div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6 kudos">👍 {{.Kudos}}</div>
-                                        </div>
+                                    <div class="row">
+                                        <div class="col-12 views">👁   {{.Views}}</div>
                                     </div>
-                                    <div class="col-2 rank">
-                                        #{{inc $index}}
+                                    <div class="row">
+                                        <div class="col-12 kudos">👍 {{.Kudos}}</div>
                                     </div>
                                 </div>
-                            </a>
-                        </div>
-                        {{if eq $index 2}}
-                        <div class="col-1 text-center next">
+                                <div class="col-2 d-none d-sm-block rank">
+                                    #{{inc $index}}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {{if eq $index 2}}
+                        <div class="col-2 text-center next">
                             {{if hasNextDate $.Date}}
-                            <a href="/{{nextDate $.Date}}">&gt;</a>
+                                <a href="/{{nextDate $.Date}}">&gt;</a>
                             {{else}}
-                            <p href="/{{nextDate $.Date}}">&gt;</p>
+                                <p href="/{{nextDate $.Date}}">&gt;</p>
                             {{end}}
                         </div>
-                        {{end}}
-                    </div>
-                {{end}}
+                    {{end}}
+                </div>
+            {{end}}
+            <div class="row justify-content-center align-middle">
+                <p class="disclaimer">Alleen toppers na 8 April 2018 zijn beschikbaar.</p>
             </div>
         </div>
     </body>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        dateInput = document.getElementById("date-input")
+        dateInput.addEventListener("input", function(e){
+            window.location = "/" + e.srcElement.value.replace(new RegExp("-", 'g'), ".");
+        });
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117251200-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-117251200-1');
+    </script>
 </html>

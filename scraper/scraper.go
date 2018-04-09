@@ -43,7 +43,7 @@ func (sc *Scraper) Scrape() error {
 		h.ForEach(".dump-cnt a.dumpthumb", func(i int, e *colly.HTMLElement) {
 			views, kudos, err := getViewsAndKudos(e)
 			if err != nil {
-				fmt.Printf("getViewsAndKudos error: %v", err)
+				log.Printf("getViewsAndKudos error: %v", err)
 				return
 			}
 
@@ -55,7 +55,13 @@ func (sc *Scraper) Scrape() error {
 				Url:   e.Attr("href"),
 				Thumb: e.ChildAttr("img", "src"),
 			}
+
 			day.Videos = append(day.Videos, v)
+
+			err = sc.db.PutImage(e.ChildAttr("img", "src"))
+			if err != nil {
+				log.Printf("save image error: %s", err)
+			}
 		})
 	})
 
