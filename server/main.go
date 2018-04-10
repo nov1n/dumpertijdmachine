@@ -18,12 +18,12 @@ import (
 )
 
 var (
-	//dbName       = "/home/robert/dumpertijdmachine/storage.db"
 	bucketName   = "videos-by-day"
 	projectID    = "dumpertijdmachine"
 	templatePath = "index.tmpl"
 	startDate    = "2018.04.08"
 	db           storage.Storage
+	sc           scraper.Scraper
 	numVids      = 5
 	cache        = make(map[time.Time]string)
 )
@@ -37,8 +37,8 @@ func main() {
 	}
 	defer db.Close()
 
-	// Schedule crawler
-	sc := scraper.NewScraper(db)
+	// Schedule scraper
+	sc = scraper.NewStandaloneScraper(db)
 	gocron.Every(1).Day().At("00:05").Do(sc.Scrape)
 	gocron.Every(2).Hours().Do(sc.Scrape)
 	go func() {
