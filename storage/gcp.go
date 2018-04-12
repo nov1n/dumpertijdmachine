@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 
 	"golang.org/x/net/context"
 
@@ -37,7 +36,7 @@ func NewGCS(projectID, bucket string) (*GCS, error) {
 	}, nil
 }
 
-func (g *GCS) PutDay(date time.Time, day *types.Day) error {
+func (g *GCS) PutDay(dateKey string, day *types.Day) error {
 	data, err := proto.Marshal(day)
 	if err != nil {
 		return fmt.Errorf("marshal day: %s", err)
@@ -48,7 +47,7 @@ func (g *GCS) PutDay(date time.Time, day *types.Day) error {
 		// pass
 	}
 
-	obj := bkt.Object(KeyForDate(date))
+	obj := bkt.Object(dateKey)
 	w := obj.NewWriter(g.ctx)
 	defer w.Close()
 	if _, err := fmt.Fprintf(w, "%s", data); err != nil {
@@ -58,9 +57,7 @@ func (g *GCS) PutDay(date time.Time, day *types.Day) error {
 	return nil
 }
 
-func (g *GCS) GetDay(date time.Time) (*types.Day, error) {
-	dateKey := KeyForDate(date)
-
+func (g *GCS) GetDay(dateKey string) (*types.Day, error) {
 	day := &types.Day{}
 
 	bkt := g.db.Bucket(g.bucket)
@@ -77,7 +74,7 @@ func (g *GCS) GetDay(date time.Time) (*types.Day, error) {
 	}
 
 	if data == nil {
-		return nil, fmt.Errorf("day not found for date %s", date)
+		return nil, fmt.Errorf("day not found for date %s", dateKey)
 	}
 
 	err = proto.Unmarshal(data.Bytes(), day)

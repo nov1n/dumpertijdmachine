@@ -10,8 +10,8 @@ import (
 )
 
 type Storage interface {
-	PutDay(date time.Time, day *types.Day) error
-	GetDay(date time.Time) (*types.Day, error)
+	PutDay(dateKey string, day *types.Day) error
+	GetDay(dateKey string) (*types.Day, error)
 	PutImage(url string) error
 	GetImage(url string) (*bytes.Buffer, error)
 	Close() error

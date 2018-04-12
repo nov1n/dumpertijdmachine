@@ -81,7 +81,8 @@ func (sc *StandaloneScraper) Scrape() error {
 	}
 
 	// Save to storage
-	err = sc.db.PutDay(time.Now(), day)
+	todayKey := storage.KeyForDate(time.Now())
+	err = sc.db.PutDay(todayKey, day)
 	if err != nil {
 		return fmt.Errorf("could not put day: %s", err)
 	}

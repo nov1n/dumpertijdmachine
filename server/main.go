@@ -25,7 +25,7 @@ var (
 	db           storage.Storage
 	sc           scraper.Scraper
 	numVids      = 5
-	cache        = make(map[time.Time]string)
+	cache        = make(map[string]string)
 )
 
 func main() {
@@ -37,14 +37,12 @@ func main() {
 	}
 	defer db.Close()
 
-	// Schedule scraper
+	// Schedule crons
 	sc = scraper.NewStandaloneScraper(db)
 	gocron.Every(1).Day().At("00:05").Do(sc.Scrape)
-	gocron.Every(2).Hours().Do(sc.Scrape)
-	go func() {
-		log.Print("Scheduling scraper every 2 hours.")
-		<-gocron.Start()
-	}()
+	gocron.Every(1).Day().At("00:05").Do(deleteYesterdayFromCache)
+	gocron.Every(1).Hours().Do(sc.Scrape)
+	go func() { <-gocron.Start() }()
 
 	// Setup webserver
 	r := mux.NewRouter()
@@ -55,11 +53,10 @@ func main() {
 }
 
 func dayHandler(w http.ResponseWriter, r *http.Request) {
-	dateS := mux.Vars(r)["date"]
-	date, _ := time.Parse("2006.01.02", dateS)
+	date := mux.Vars(r)["date"]
 
 	if r.URL.Path == "/" {
-		date = time.Now()
+		date = storage.KeyForDate(time.Now())
 	} else {
 		// Check if it is cached
 		if val, ok := cache[date]; ok {
@@ -125,4 +122,12 @@ func dayHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Add cache entry for: %s", date)
 	cache[date] = tpl.String()
 	fmt.Fprintf(w, tpl.String())
+}
+
+func deleteYesterdayFromCache() {
+	today := time.Now()
+	yesterday := today.AddDate(0, 0, -1)
+	yesterdayKey := storage.KeyForDate(yesterday)
+	log.Printf("Deleting %s from cache.", yesterdayKey)
+	delete(cache, yesterdayKey) // So that the right arrow will be a link to today's page
 }
